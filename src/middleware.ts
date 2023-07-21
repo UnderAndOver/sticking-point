@@ -8,7 +8,7 @@ export function middleware(req: NextRequest) {
     "/",
     "/logo.png",
     "/favicon.ico",
-  ]; // add root path here if needed
+  ];  // add root path here if needed
 
   // Check if the request is for any excluded path
   if (excludedPaths.some((path) => req.nextUrl.pathname.startsWith(path))) {
