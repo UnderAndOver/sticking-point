@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+// import axios from "axios";
 import { fetchTranscription, fetchTranscriptionJobs } from "./transcription";
 import Transcription from "@/components/Transcription";
 declare global {
@@ -75,25 +75,25 @@ const UploadPage = () => {
     console.log("youtube api key:", yt_key);
     //TODO: MOVE YOUTUBE API KEY TO BACKEND
     // Retrieve video details from YouTube Data API
-    const response = await axios.get(
-      `https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${yt_key}&part=snippet`
-    );
-    console.log(response);
-    if (response.data.items.length > 0) {
-      const videoDetails = response.data.items[0].snippet;
-      setTitle(videoDetails.title);
+    // const response = await axios.get(
+    //   `https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${yt_key}&part=snippet`
+    // );
+    // console.log(response);
+    // if (response.data.items.length > 0) {
+    //   const videoDetails = response.data.items[0].snippet;
+    //   setTitle(videoDetails.title);
 
-      // Category fetching
-      const categoryResponse = await axios.get(
-        `https://www.googleapis.com/youtube/v3/videoCategories?id=${videoDetails.categoryId}&key=${yt_key}&part=snippet`
-      );
-      if (categoryResponse.data.items.length > 0) {
-        setCategory(categoryResponse.data.items[0].snippet.title);
-      }
+    // Category fetching
+    //   const categoryResponse = await axios.get(
+    //     `https://www.googleapis.com/youtube/v3/videoCategories?id=${videoDetails.categoryId}&key=${yt_key}&part=snippet`
+    //   );
+    //   if (categoryResponse.data.items.length > 0) {
+    //     setCategory(categoryResponse.data.items[0].snippet.title);
+    //   }
 
-      setDescription(videoDetails.description);
-      setTags(videoDetails.tags.join(", "));
-    }
+    //   setDescription(videoDetails.description);
+    //   setTags(videoDetails.tags.join(", "));
+    // }
 
     try {
       // const jobsRes = await axios.get("/transcription");
@@ -157,7 +157,7 @@ const UploadPage = () => {
 
     try {
       // Make a POST request to your server's API endpoint for uploading videos
-      const response = await axios.post("/api/videos", videoData);
+      // const response = await axios.post("/api/videos", videoData);
       setMessage("Video uploaded successfully!");
     } catch (error) {
       setMessage("An error occurred while uploading the video.");
