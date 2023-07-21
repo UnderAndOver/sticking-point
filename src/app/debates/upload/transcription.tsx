@@ -3,7 +3,7 @@ import {
   RevAiApiDeployment,
   RevAiApiDeploymentConfigMap,
 } from "revai-node-sdk";
-export const fetchTranscription = async (jobId) => {
+export const fetchTranscription = async (jobId: string) => {
   const accessToken = process.env.NEXT_PUBLIC_REV_API_KEY || "bad";
 
   var client = new RevAiApiClient(accessToken);

@@ -1,7 +1,14 @@
 "use client";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 
-const FaqItem = ({ question, answer, isOpen, onClick }) => {
+interface FaqItemProps {
+  question: string;
+  answer: string;
+  isOpen: boolean;
+  onClick: () => void; // You may want to replace this with the actual function type if it is not a void function
+}
+
+const FaqItem = ({ question, answer, isOpen, onClick }: FaqItemProps) => {
   const handleToggle = () => {
     onClick();
   };
@@ -49,7 +56,7 @@ const FaqItem = ({ question, answer, isOpen, onClick }) => {
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(0);
-  const handleItemClick = (index) => {
+  const handleItemClick = (index: SetStateAction<number>) => {
     if (openIndex === index) {
       setOpenIndex(-1); // Close the currently open item.
     } else {

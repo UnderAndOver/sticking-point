@@ -12,7 +12,7 @@ export default function Transcription({
   videoUrl = DEMO_MEDIA_URL;
   const [currentTime, setCurrentTime] = useState(0);
 
-  const handleWordClick = (word) => {
+  const handleWordClick = (word: { start: SetStateAction<number> }) => {
     setCurrentTime(word.start);
   };
 
@@ -21,7 +21,15 @@ export default function Transcription({
     autoFocus: false,
     placeholder: "Start typing...",
     style: { outline: "none" },
-    renderElement: ({ attributes, children, element }) => {
+    renderElement: ({
+      attributes,
+      children,
+      element,
+    }: {
+      attributes: any;
+      children: any;
+      element: any;
+    }) => {
       if (element.type === "word") {
         return (
           <span
@@ -69,7 +77,7 @@ export default function Transcription({
 
 const DEMO_MEDIA_URL = "presidential-debate-2-yDiWaD7juZM.mp4";
 import DEMO_TRANSCRIPT from "@/../example.json";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 type RevFormat = {
   speakers: Array<{ id: number; name: string }>;
   monologues: Array<{
