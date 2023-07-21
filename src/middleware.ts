@@ -8,7 +8,7 @@ export function middleware(req: NextRequest) {
     "/",
     "/logo.png",
     "/favicon.ico",
-  ]; // add root path here if needed
+  ]; // add more paths here if needed
 
   // Check if the request is for any excluded path
   if (excludedPaths.some((path) => req.nextUrl.pathname.startsWith(path))) {
@@ -16,5 +16,5 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  return NextResponse.redirect(`${process.env.BASE_URL}/`);
+  return NextResponse.redirect("https://www.stickingpoint.co/");
 }
