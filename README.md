@@ -5,7 +5,7 @@ Sticking Point is an AI-enhanced platform that allows users to engage in structu
 ## Technologies Used
 
 Frontend: Next.js, React, TailwindCSS
-Backend: Node.js, Express.js
+Backend: Node.js, Golang
 Database: PostgreSQL
 AI: OpenAI GPT-4
 Deployment: Vercel (Frontend), AWS (Backend)
