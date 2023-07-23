@@ -4,7 +4,7 @@ import React from "react";
 export default function Debates() {
   return (
     <div>
-      {/* <h1>Debates</h1>
+      <h1>Debates</h1>
       <p>Go here to upload debates</p>
       <a href="/debates/upload">
         <button className="px-4 py-2 bg-blue-500 text-white rounded">
@@ -12,7 +12,7 @@ export default function Debates() {
         </button>
       </a>
       <div>TEST TRANSCRIPTION</div>
-      <Transcription /> */}
+      <Transcription />
     </div>
   );
 }
