@@ -8,13 +8,9 @@ export const metadata: Metadata = {
   title: "Sticking Point",
   description: "Debate platform with AI assistance",
   keywords: "debate platform, AI assistance, AI",
-  icons: [
-    {
-      url: "/favicon.ico",
-      sizes: "32x32",
-      type: "image/png",
-    },
-  ],
+  icons: {
+    icon: "/logo.png",
+  },
 };
 export default function Home() {
   return (
