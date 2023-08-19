@@ -17,7 +17,26 @@ const Dynamic = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-function VideoWithTranscript({ videoUrl, transcriptData }) {
+type Paragraph = {
+  type: string;
+  speaker: string;
+  children: {
+    type: string;
+    start: number;
+    end: number;
+    children: {
+      text: string;
+    }[];
+  }[];
+};
+
+function VideoWithTranscript({
+  videoUrl,
+  transcriptData,
+}: {
+  videoUrl: string | undefined;
+  transcriptData: Paragraph[] | undefined;
+}) {
   const videoRef = useRef(null);
   const DEMO_MEDIA_URL = "presidential-debate-2-yDiWaD7juZM.mp4";
   videoUrl = DEMO_MEDIA_URL;

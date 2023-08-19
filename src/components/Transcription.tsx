@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { RefObject, useEffect, useRef } from "react";
 type RevFormat = {
   speakers: Array<{ id: number; name: string }>;
   monologues: Array<{
@@ -19,23 +19,29 @@ type SlateFormat = {
   words: Array<{ end: number; start: number; text: string }>;
   paragraphs: Array<{ speaker: string; start: number; end: number }>;
 };
-export default function Transcript({ transcriptData, videoRef }) {
+export default function Transcript({
+  transcriptData,
+  videoRef,
+}: {
+  transcriptData: Paragraph[] | undefined;
+  videoRef: RefObject<ReactPlayer>;
+}) {
   transcriptData = transcriptData || getTranscript();
 
   const currentWordIndex = useRef(0);
-  const words = useRef(null);
-  const rafRef = useRef(null);
+  const words = useRef<Element[] | null>(null);
+  const rafRef = useRef<number | null>(null);
   let globalWordIndex = 0;
 
-  const seekToWord = (wordIdx) => {
-    if (videoRef && videoRef.current) {
+  const seekToWord = (wordIdx: number) => {
+    if (videoRef?.current && words?.current) {
       const targetTime = parseFloat(
-        words.current[wordIdx].getAttribute("data-start")
+        words.current[wordIdx].getAttribute("data-start") as string
       );
       videoRef.current.seekTo(targetTime / videoRef.current.getDuration());
       currentWordIndex.current = wordIdx;
-      words.current.forEach((word) => word.classList.remove("bg-blue-700"));
-      words.current[wordIdx].className = "bg-blue-700";
+      words.current!.forEach((word) => word.classList.remove("bg-blue-700"));
+      words.current![wordIdx].className = "bg-blue-700";
     }
   };
 
@@ -43,7 +49,7 @@ export default function Transcript({ transcriptData, videoRef }) {
     words.current = Array.from(document.querySelectorAll(".transcript span"));
 
     const updateHighlight = () => {
-      if (!videoRef.current) return;
+      if (!videoRef?.current || !words?.current) return;
 
       const currentTime = videoRef.current.getCurrentTime();
 
@@ -51,7 +57,9 @@ export default function Transcript({ transcriptData, videoRef }) {
       while (
         currentWordIndex.current < words.current.length &&
         parseFloat(
-          words.current[currentWordIndex.current].getAttribute("data-end")
+          words.current[currentWordIndex.current].getAttribute(
+            "data-end"
+          ) as string
         ) < currentTime
       ) {
         words.current[currentWordIndex.current].classList.remove("bg-blue-700");
@@ -62,7 +70,9 @@ export default function Transcript({ transcriptData, videoRef }) {
       while (
         currentWordIndex.current > 0 &&
         parseFloat(
-          words.current[currentWordIndex.current].getAttribute("data-start")
+          words.current[currentWordIndex.current].getAttribute(
+            "data-start"
+          ) as string
         ) > currentTime
       ) {
         currentWordIndex.current--;
@@ -72,11 +82,15 @@ export default function Transcript({ transcriptData, videoRef }) {
       if (
         currentWordIndex.current < words.current.length &&
         parseFloat(
-          words.current[currentWordIndex.current].getAttribute("data-start")
+          words.current[currentWordIndex.current].getAttribute(
+            "data-start"
+          ) as string
         ) <= currentTime &&
         currentTime <=
           parseFloat(
-            words.current[currentWordIndex.current].getAttribute("data-end")
+            words.current[currentWordIndex.current].getAttribute(
+              "data-end"
+            ) as string
           )
       ) {
         words.current[currentWordIndex.current].className = "bg-blue-700";
@@ -88,7 +102,7 @@ export default function Transcript({ transcriptData, videoRef }) {
     rafRef.current = requestAnimationFrame(updateHighlight);
 
     return () => {
-      cancelAnimationFrame(rafRef.current);
+      cancelAnimationFrame(rafRef.current!);
     };
   }, [videoRef]);
 
@@ -122,10 +136,24 @@ export default function Transcript({ transcriptData, videoRef }) {
 
 const DEMO_MEDIA_URL = "presidential-debate-2-yDiWaD7juZM.mp4";
 import DEMO_TRANSCRIPT from "@/../example.json";
+import ReactPlayer from "react-player";
 
-function convertJsonFormatNew(original: RevFormat): any {
+type Paragraph = {
+  type: string;
+  speaker: string;
+  children: {
+    type: string;
+    start: number;
+    end: number;
+    children: {
+      text: string;
+    }[];
+  }[];
+};
+
+function convertJsonFormatNew(original: RevFormat): Paragraph[] {
   const speakerMap = new Map(original.speakers.map((s) => [s.id, s.name]));
-  let paragraphs = [];
+  let paragraphs: Paragraph[] = [];
 
   for (let monologue of original.monologues) {
     let words = [];
@@ -172,7 +200,7 @@ function timestampConvert(timestamp: string) {
   );
 }
 
-function getTranscript() {
+function getTranscript(): Paragraph[] {
   let transcript = convertJsonFormatNew(DEMO_TRANSCRIPT);
   return transcript;
 }
