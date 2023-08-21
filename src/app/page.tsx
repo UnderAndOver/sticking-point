@@ -1,9 +1,9 @@
-import Hero from "../components/Hero";
+import Hero from "../components/home/Hero";
 import { Metadata } from "next";
-import Content from "@/components/Content";
-import Features from "@/components/Features";
-import FAQ from "@/components/FAQ";
-import Contact from "@/components/Contact";
+import Content from "@/components/home/Content";
+import Features from "@/components/home/Features";
+import FAQ from "@/components/home/FAQ";
+import Contact from "@/components/home/Contact";
 export const metadata: Metadata = {
   title: "Sticking Point",
   description: "Debate platform with AI assistance",
