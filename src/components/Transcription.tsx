@@ -1,83 +1,5 @@
 "use client";
-import { createParagraphPlugin } from "@udecode/plate";
-import { Plate, createPlugins } from "@udecode/plate-common";
-import ReactPlayer from "react-player";
-
-const plugins = createPlugins([createParagraphPlugin()]);
-
-export default function Transcription({
-  videoUrl = "https://www.youtube.com/watch?v=yDiWaD7juZM",
-  initialTranscript = getTranscript(),
-}) {
-  videoUrl = DEMO_MEDIA_URL;
-  const [currentTime, setCurrentTime] = useState(0);
-
-  const handleWordClick = (word: { start: SetStateAction<number> }) => {
-    setCurrentTime(word.start);
-  };
-
-  const editableProps = {
-    spellCheck: false,
-    autoFocus: false,
-    placeholder: "Start typing...",
-    style: { outline: "none" },
-    renderElement: ({
-      attributes,
-      children,
-      element,
-    }: {
-      attributes: any;
-      children: any;
-      element: any;
-    }) => {
-      if (element.type === "word") {
-        return (
-          <span
-            {...attributes}
-            onClick={() => handleWordClick(element)}
-            style={{ cursor: "pointer" }}
-          >
-            {children}
-          </span>
-        );
-      }
-
-      if (element.type === "paragraph") {
-        return (
-          <p {...attributes}>
-            {element.speaker}: {children}
-          </p>
-        );
-      }
-
-      return <p {...attributes}>{children}</p>;
-    },
-  };
-
-  return (
-    <div style={{ display: "flex" }}>
-      <div>
-        <ReactPlayer
-          url={videoUrl}
-          controls={true}
-          progressInterval={1000}
-          onProgress={({ playedSeconds }) => setCurrentTime(playedSeconds)}
-        />
-      </div>
-      <div>
-        <Plate
-          editableProps={editableProps}
-          initialValue={initialTranscript}
-          plugins={plugins}
-        />
-      </div>
-    </div>
-  );
-}
-
-const DEMO_MEDIA_URL = "presidential-debate-2-yDiWaD7juZM.mp4";
-import DEMO_TRANSCRIPT from "@/../example.json";
-import { SetStateAction, useState } from "react";
+import { RefObject, useEffect, useRef } from "react";
 type RevFormat = {
   speakers: Array<{ id: number; name: string }>;
   monologues: Array<{
@@ -97,60 +19,141 @@ type SlateFormat = {
   words: Array<{ end: number; start: number; text: string }>;
   paragraphs: Array<{ speaker: string; start: number; end: number }>;
 };
+export default function Transcript({
+  transcriptData,
+  videoRef,
+}: {
+  transcriptData: Paragraph[] | undefined;
+  videoRef: RefObject<ReactPlayer>;
+}) {
+  transcriptData = transcriptData || getTranscript();
 
-function convertJsonFormat(original: RevFormat): SlateFormat {
-  const speakerMap = new Map(original.speakers.map((s) => [s.id, s.name]));
-  let words: SlateFormat["words"] = [];
-  let paragraphs: SlateFormat["paragraphs"] = [];
+  const currentWordIndex = useRef(0);
+  const words = useRef<Element[] | null>(null);
+  const rafRef = useRef<number | null>(null);
+  let globalWordIndex = 0;
 
-  for (let monologue of original.monologues) {
-    let paragraphStart: number | null = null;
-
-    for (let element of monologue.elements) {
-      if (element.type !== "text" || !element.value.trim()) continue;
-      if (element.timestamp && element.end_timestamp) {
-        const start =
-          Date.UTC(
-            1970,
-            0,
-            1,
-            ...element.timestamp
-              .split(",")
-              .flatMap((v, i) => (i === 0 ? v.split(":") : v))
-              .map(Number)
-          ) / 1000;
-        const end =
-          Date.UTC(
-            1970,
-            0,
-            1,
-            ...element.end_timestamp
-              .split(",")
-              .flatMap((v, i) => (i === 0 ? v.split(":") : v))
-              .map(Number)
-          ) / 1000;
-        if (paragraphStart === null) paragraphStart = start;
-
-        words.push({ start, end, text: element.value.trim() });
-      }
-
-      if (paragraphStart !== null) {
-        const paragraphEnd = words[words.length - 1].end;
-        paragraphs.push({
-          speaker: speakerMap.get(monologue.speaker) || "Unknown",
-          start: paragraphStart,
-          end: paragraphEnd,
-        });
-      }
+  const seekToWord = (wordIdx: number) => {
+    if (videoRef?.current && words?.current) {
+      const targetTime = parseFloat(
+        words.current[wordIdx].getAttribute("data-start") as string
+      );
+      videoRef.current.seekTo(targetTime / videoRef.current.getDuration());
+      currentWordIndex.current = wordIdx;
+      words.current!.forEach((word) => word.classList.remove("bg-blue-700"));
+      words.current![wordIdx].className = "bg-blue-700";
     }
-  }
+  };
 
-  return { words, paragraphs };
+  useEffect(() => {
+    words.current = Array.from(document.querySelectorAll(".transcript span"));
+
+    const updateHighlight = () => {
+      if (!videoRef?.current || !words?.current) return;
+
+      const currentTime = videoRef.current.getCurrentTime();
+
+      // Traverse forward if needed
+      while (
+        currentWordIndex.current < words.current.length &&
+        parseFloat(
+          words.current[currentWordIndex.current].getAttribute(
+            "data-end"
+          ) as string
+        ) < currentTime
+      ) {
+        words.current[currentWordIndex.current].classList.remove("bg-blue-700");
+        currentWordIndex.current++;
+      }
+
+      // Traverse backward if needed
+      while (
+        currentWordIndex.current > 0 &&
+        parseFloat(
+          words.current[currentWordIndex.current].getAttribute(
+            "data-start"
+          ) as string
+        ) > currentTime
+      ) {
+        currentWordIndex.current--;
+      }
+
+      // Highlight current word
+      if (
+        currentWordIndex.current < words.current.length &&
+        parseFloat(
+          words.current[currentWordIndex.current].getAttribute(
+            "data-start"
+          ) as string
+        ) <= currentTime &&
+        currentTime <=
+          parseFloat(
+            words.current[currentWordIndex.current].getAttribute(
+              "data-end"
+            ) as string
+          )
+      ) {
+        words.current[currentWordIndex.current].className = "bg-blue-700";
+      }
+
+      rafRef.current = requestAnimationFrame(updateHighlight);
+    };
+
+    rafRef.current = requestAnimationFrame(updateHighlight);
+
+    return () => {
+      cancelAnimationFrame(rafRef.current!);
+    };
+  }, [videoRef]);
+
+  return (
+    <div className="transcript">
+      {transcriptData.map((paragraph, idx) => (
+        <div key={idx} className="mb-4">
+          <div className="mb-2 font-bold">{paragraph.speaker}</div>
+          <div>
+            {paragraph.children.map((word) => {
+              const currentWordIndex = globalWordIndex;
+              globalWordIndex++;
+
+              return (
+                <span
+                  key={currentWordIndex}
+                  data-start={word.start}
+                  data-end={word.end}
+                  onClick={() => seekToWord(currentWordIndex)}
+                >
+                  {word.children[0].text}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
-function convertJsonFormatNew(original: RevFormat): any {
+const DEMO_MEDIA_URL = "presidential-debate-2-yDiWaD7juZM.mp4";
+import DEMO_TRANSCRIPT from "@/../example.json";
+import ReactPlayer from "react-player";
+
+type Paragraph = {
+  type: string;
+  speaker: string;
+  children: {
+    type: string;
+    start: number;
+    end: number;
+    children: {
+      text: string;
+    }[];
+  }[];
+};
+
+function convertJsonFormatNew(original: RevFormat): Paragraph[] {
   const speakerMap = new Map(original.speakers.map((s) => [s.id, s.name]));
-  let paragraphs = [];
+  let paragraphs: Paragraph[] = [];
 
   for (let monologue of original.monologues) {
     let words = [];
@@ -159,32 +162,14 @@ function convertJsonFormatNew(original: RevFormat): any {
       if (element.type !== "text" || !element.value.trim()) continue;
 
       if (element.timestamp && element.end_timestamp) {
-        const start =
-          Date.UTC(
-            1970,
-            0,
-            1,
-            ...element.timestamp
-              .split(",")
-              .flatMap((v, i) => (i === 0 ? v.split(":") : v))
-              .map(Number)
-          ) / 1000;
-        const end =
-          Date.UTC(
-            1970,
-            0,
-            1,
-            ...element.end_timestamp
-              .split(",")
-              .flatMap((v, i) => (i === 0 ? v.split(":") : v))
-              .map(Number)
-          ) / 1000;
+        const start = timestampConvert(element.timestamp);
+        const end = timestampConvert(element.end_timestamp);
 
         words.push({
           type: "word",
           start,
           end,
-          children: [{ text: element.value.trim() }],
+          children: [{ text: element.value.trim() + " " }],
         });
       }
     }
@@ -201,7 +186,21 @@ function convertJsonFormatNew(original: RevFormat): any {
   return paragraphs;
 }
 
-function getTranscript() {
+function timestampConvert(timestamp: string) {
+  return (
+    Date.UTC(
+      1970,
+      0,
+      1,
+      ...timestamp
+        .split(",")
+        .flatMap((v, i) => (i === 0 ? v.split(":") : v))
+        .map(Number)
+    ) / 1000
+  );
+}
+
+function getTranscript(): Paragraph[] {
   let transcript = convertJsonFormatNew(DEMO_TRANSCRIPT);
   return transcript;
 }

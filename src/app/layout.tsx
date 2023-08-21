@@ -17,10 +17,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Header />
-        {children}
-        <Footer />
+      <body suppressHydrationWarning={true} className={inter.className}>
+        <div className="flex flex-col h-screen">
+          <Header />
+          <div className="grow mb-auto">{children}</div>
+          <Footer />
+        </div>
       </body>
     </html>
   );
