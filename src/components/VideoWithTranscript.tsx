@@ -34,12 +34,12 @@ function VideoWithTranscript({
   videoUrl,
   transcriptData,
 }: {
-  videoUrl: string | undefined;
+  videoUrl: string;
   transcriptData: Paragraph[] | undefined;
 }) {
   const videoRef = useRef(null);
-  const DEMO_MEDIA_URL = "presidential-debate-2-yDiWaD7juZM.mp4";
-  videoUrl = DEMO_MEDIA_URL;
+  // const DEMO_MEDIA_URL = "presidential-debate-2-yDiWaD7juZM.mp4";
+  // videoUrl = DEMO_MEDIA_URL;
   return (
     <Dynamic>
       <div className="flex w-full">
