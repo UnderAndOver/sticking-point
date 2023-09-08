@@ -1,20 +1,12 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { authMiddleware } from "@clerk/nextjs";
 
-export function middleware(req: NextRequest) {
-  const excludedPaths = ["_next", "static", "", "logo.png", "favicon.ico"]; // add more paths here if needed
+// This example protects all routes including api/trpc routes
+// Please edit this to allow other routes to be public as needed.
+// See https://clerk.com/docs/references/nextjs/auth-middleware for more information about configuring your middleware
+export default authMiddleware({
+  publicRoutes: ["/", "/debates"],
+});
 
-  // Get the first segment of the path
-  const firstSegment = req.nextUrl.pathname.split("/")[1];
-
-  // Check if the first segment is an excluded path
-  if (excludedPaths.includes(firstSegment) || process.env.DEV_MODE == "true") {
-    // If it is, do nothing and let the request continue
-    return NextResponse.next();
-  }
-
-  const url = req.nextUrl.clone();
-  // If the first segment is not an excluded path, redirect to '/'
-  url.pathname = "/";
-  return NextResponse.redirect(url.toString());
-}
+export const config = {
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+};

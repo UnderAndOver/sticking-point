@@ -1,3 +1,4 @@
+import { ClerkProvider, UserButton } from "@clerk/nextjs";
 import Header from "@/components/Header";
 import "./globals.css";
 import { Inter } from "next/font/google";
@@ -16,14 +17,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body suppressHydrationWarning={true} className={inter.className}>
-        <div className="flex flex-col h-screen">
-          <Header />
-          <div className="grow mb-auto">{children}</div>
-          <Footer />
-        </div>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body suppressHydrationWarning={true} className={inter.className}>
+          <div className="flex flex-col h-screen">
+            <Header />
+            <div className="grow mb-auto">{children}</div>
+            <Footer />
+          </div>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
