@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.23.3",
+    "@clerk/nextjs": "^4.23.5",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tooltip": "^1.0.6",
     "@tanstack/react-table": "^8.9.3",
