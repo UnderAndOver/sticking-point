@@ -1,14 +1,14 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+// import React, { useState, useEffect, useRef } from "react";
 // import axios from "axios";
-import { fetchTranscription, fetchTranscriptionJobs } from "./transcription";
-import Transcription from "@/components/Transcription";
-declare global {
-  interface Window {
-    YT: any;
-    onYouTubeIframeAPIReady: any;
-  }
-}
+// import { fetchTranscription, fetchTranscriptionJobs } from "./transcription";
+// import Transcription from "@/components/Transcription";
+// declare global {
+//   interface Window {
+//     YT: any;
+//     onYouTubeIframeAPIReady: any;
+//   }
+// }
 
 const UploadPage = () => {
   // const [link, setLink] = useState("");
