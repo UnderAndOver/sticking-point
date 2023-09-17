@@ -1,6 +1,6 @@
 import React from "react";
-import { DataTable } from "./data-table";
-import { Video, columns } from "./columns";
+import { DataTable } from "./(components)/data-table";
+import { Video, columns } from "./(components)/columns";
 import { zocker } from "zocker";
 import { z } from "zod";
 

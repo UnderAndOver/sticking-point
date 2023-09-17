@@ -1,5 +1,5 @@
 import React from "react";
-import VideoWithTranscript from "@/components/VideoWithTranscript";
+import VideoWithTranscript from "../(components)/VideoWithTranscript";
 const DEMO_MEDIA_URL = "/media/presidential-debate-2-yDiWaD7juZM.mp4";
 export default function Debates() {
   return (

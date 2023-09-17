@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { useScrollPosition } from "@/hooks/useScrollPosition";
-import { UserButton } from "@clerk/nextjs";
 // "text-gray-400 bg-gray-900 body-font"
 const Header = () => {
   const scrollPosition = useScrollPosition();
@@ -33,9 +32,6 @@ const Header = () => {
             About
           </a>
         </nav>
-        <div>
-          <UserButton afterSignOutUrl="/" />
-        </div>
         <button className="inline-flex items-center bg-gray-800 border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0">
           Learn More
           <svg
