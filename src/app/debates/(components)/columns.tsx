@@ -9,7 +9,7 @@ import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
-} from "@radix-ui/react-tooltip";
+} from "@/components/ui/tooltip";
 import Link from "next/link";
 
 // This type is used to define the shape of our data.
