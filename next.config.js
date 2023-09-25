@@ -7,7 +7,16 @@ const nextConfig = {
         hostname: "dummyimage.com",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "*.googleusercontent.com",
+        port: "",
+      },
     ],
+  },
+  experimental: {
+    serverActions: true,
+    optimizePackageImports: ["@tanstack/react-table", ""],
   },
 };
 
