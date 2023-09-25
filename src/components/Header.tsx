@@ -1,14 +1,43 @@
 "use client";
 import Image from "next/image";
 import { useScrollPosition } from "@/hooks/useScrollPosition";
+import { useState, useEffect } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Menu } from "lucide-react"; // Import the Menu icon from lucide-react
 
 function AuthButton() {
   const { data: session } = useSession();
+  const [showPopup, setShowPopup] = useState(false);
+  const [opacity, setOpacity] = useState("opacity-0");
+
+  let timer: NodeJS.Timeout | undefined;
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [timer]);
+
+  const handleMouseOver = () => {
+    clearTimeout(timer);
+    setShowPopup(true);
+    setOpacity("opacity-100");
+  };
+
+  const handleMouseOut = () => {
+    timer = setTimeout(() => {
+      setOpacity("opacity-0");
+      setTimeout(() => setShowPopup(false), 300); // same duration as your transition
+    }, 500); // 500ms delay
+  };
+
   if (session) {
     return (
-      <div className="group relative">
+      <div
+        className="group relative"
+        onMouseOver={handleMouseOver}
+        onMouseOut={handleMouseOut}
+      >
         <div className="rounded-full w-8 h-8 bg-gray-500 hover:bg-gray-400">
           {/* Your Profile Picture Here */}
           {session?.user?.image && (
@@ -21,33 +50,40 @@ function AuthButton() {
             />
           )}
         </div>
-        <div className="absolute right-0 top-12 w-48 bg-white text-black p-4 rounded-lg shadow-lg hidden group-hover:block">
-          <div className="flex justify-center items-center">
-            <div className="rounded-full w-16 h-16 bg-gray-300">
-              {/* Avatar Image Here */}
-              {session?.user?.image && (
-                <Image
-                  className="rounded-full w-16 h-16"
-                  src={session.user.image}
-                  width={64}
-                  height={64}
-                  alt="avatar"
-                />
-              )}
+        {showPopup && (
+          <div
+            className={`absolute right-0 top-12 w-48 bg-white text-black p-4 rounded-lg shadow-lg transition-all duration-300 ease-in-out ${opacity}`}
+          >
+            <div className="flex justify-center items-center">
+              <div className="rounded-full w-16 h-16 bg-gray-300">
+                {/* Avatar Image Here */}
+                {session?.user?.image && (
+                  <Image
+                    className="rounded-full w-16 h-16"
+                    src={session.user.image}
+                    width={64}
+                    height={64}
+                    alt="avatar"
+                  />
+                )}
+              </div>
+            </div>
+            <div className="text-center mt-2 mb-4">
+              <p>{session?.user?.name}</p>
+            </div>
+            <hr />
+            <div className="mt-4">
+              <p className="mb-2">Settings</p>
+              <hr />
+              <button
+                className="mt-2 text-left w-full"
+                onClick={() => signOut()}
+              >
+                Sign out
+              </button>
             </div>
           </div>
-          <div className="text-center mt-2 mb-4">
-            <p>{session?.user?.name}</p>
-          </div>
-          <hr />
-          <div className="mt-4">
-            <p className="mb-2">Settings</p>
-            <hr />
-            <button className="mt-2 text-left w-full" onClick={() => signOut()}>
-              Sign out
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     );
   }
