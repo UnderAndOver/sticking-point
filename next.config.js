@@ -16,7 +16,6 @@ const nextConfig = {
   },
   experimental: {
     serverActions: true,
-    optimizePackageImports: ["@tanstack/react-table", ""],
   },
 };
 
