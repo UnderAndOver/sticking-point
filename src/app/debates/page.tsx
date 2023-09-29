@@ -1,30 +1,46 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { DataTable } from "./(components)/data-table";
-import { Video, columns } from "./(components)/columns";
 import { zocker } from "zocker";
 import { z } from "zod";
 
-async function getData(): Promise<Video[]> {
-  const schema = z.object({
-    id: z.string(),
-    name: z.string(),
-    url: z.string(),
-    uploader: z.string().max(50),
-    date: z.date(),
-    status: z.enum(["pending", "processing", "success", "failed"]),
-  });
-  const mockData: Video[] = Array.from({ length: 15 }, () =>
-    zocker(schema).generate()
-  );
-  return mockData;
+interface Video {
+  id: string;
+  name: string;
+  url: string;
+  uploader: string;
+  date: Date;
+  status: "pending" | "processing" | "success" | "failed";
 }
 
-export default async function Debates() {
-  const data = await getData();
+const schema = z.object({
+  id: z.string(),
+  name: z.string(),
+  url: z.string(),
+  uploader: z.string().max(50),
+  date: z.date(),
+  status: z.enum(["pending", "processing", "success", "failed"]),
+});
+
+function getData(): Promise<Video[]> {
+  const mockData: Video[] = Array.from(
+    { length: 15 },
+    () => zocker(schema).generate() as Video
+  );
+  return Promise.resolve(mockData);
+}
+
+export default function Debates() {
+  const [data, setData] = useState<Video[]>([]);
+
+  useEffect(() => {
+    getData().then((fetchedData) => setData(fetchedData));
+  }, []);
+
   return (
     <div>
       <h1>Debates</h1>
-      <DataTable columns={columns} data={data} />
+      <DataTable data={data} />
       <p>Go here to upload debates</p>
       <a href="/debates/upload">
         <button className="px-4 py-2 bg-blue-500 text-white rounded">
@@ -34,5 +50,3 @@ export default async function Debates() {
     </div>
   );
 }
-
-const Page = () => <div>Debates</div>;

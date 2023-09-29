@@ -1,7 +1,99 @@
 "use client";
 import Image from "next/image";
 import { useScrollPosition } from "@/hooks/useScrollPosition";
-// "text-gray-400 bg-gray-900 body-font"
+import { useState, useEffect } from "react";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { Menu } from "lucide-react"; // Import the Menu icon from lucide-react
+
+function AuthButton() {
+  const { data: session } = useSession();
+  const [showPopup, setShowPopup] = useState(false);
+  const [opacity, setOpacity] = useState("opacity-0");
+
+  let timer: NodeJS.Timeout | undefined;
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [timer]);
+
+  const handleMouseOver = () => {
+    clearTimeout(timer);
+    setShowPopup(true);
+    setOpacity("opacity-100");
+  };
+
+  const handleMouseOut = () => {
+    timer = setTimeout(() => {
+      setOpacity("opacity-0");
+      setTimeout(() => setShowPopup(false), 300); // same duration as your transition
+    }, 500); // 500ms delay
+  };
+
+  if (session) {
+    return (
+      <div
+        className="group relative"
+        onMouseOver={handleMouseOver}
+        onMouseOut={handleMouseOut}
+      >
+        <div className="rounded-full w-8 h-8 bg-gray-500 hover:bg-gray-400">
+          {/* Your Profile Picture Here */}
+          {session?.user?.image && (
+            <Image
+              className="rounded-full w-8 h-8"
+              src={session.user.image}
+              width={32}
+              height={32}
+              alt="avatar"
+            />
+          )}
+        </div>
+        {showPopup && (
+          <div
+            className={`absolute right-0 top-12 w-48 bg-white text-black p-4 rounded-lg shadow-lg transition-all duration-300 ease-in-out ${opacity}`}
+          >
+            <div className="flex justify-center items-center">
+              <div className="rounded-full w-16 h-16 bg-gray-300">
+                {/* Avatar Image Here */}
+                {session?.user?.image && (
+                  <Image
+                    className="rounded-full w-16 h-16"
+                    src={session.user.image}
+                    width={64}
+                    height={64}
+                    alt="avatar"
+                  />
+                )}
+              </div>
+            </div>
+            <div className="text-center mt-2 mb-4">
+              <p>{session?.user?.name}</p>
+            </div>
+            <hr />
+            <div className="mt-4">
+              <p className="mb-2">Settings</p>
+              <hr />
+              <button
+                className="mt-2 text-left w-full"
+                onClick={() => signOut()}
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+  return (
+    <>
+      <button onClick={() => signIn()}>Sign in</button>
+    </>
+  );
+}
+
 const Header = () => {
   const scrollPosition = useScrollPosition();
   return (
@@ -12,40 +104,50 @@ const Header = () => {
           : "shadow-none"
       }`}
     >
-      <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-        <a
-          className="flex title-font font-medium items-center text-white mb-4 md:mb-0"
-          href="/"
-        >
-          <Image src="/logo.png" width={48} height={48} alt="logo" />
-
-          <span className="ml-3 text-xl">Sticking Point</span>
-        </a>
-        <nav className="md:ml-auto flex flex-wrap items-center text-base justify-center">
-          <a className="mr-5 hover:text-white" href="/debates">
-            Debates
-          </a>
-          <a className="mr-5 hover:text-white" href="/topics">
-            Topics
-          </a>
-          <a className="mr-5 hover:text-white" href="/about">
-            About
-          </a>
-        </nav>
-        <button className="inline-flex items-center bg-gray-800 border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0">
-          Learn More
-          <svg
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="w-4 h-4 ml-1"
-            viewBox="0 0 24 24"
+      <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center h-20">
+        {/* For SMALL layout */}
+        <div className="flex justify-between w-full items-center h-full md:hidden">
+          <button className="items-center h-full">
+            <Menu color="white" size={24} />
+          </button>
+          <a
+            className="flex title-font font-medium items-center text-white h-full"
+            href="/"
           >
-            <path d="M5 12h14M12 5l7 7-7 7"></path>
-          </svg>
-        </button>
+            <Image src="/logo.png" width={48} height={48} alt="logo" />
+            <span className="ml-3 text-xl">Sticking Point</span>
+          </a>
+          <div className="items-center h-full">
+            <AuthButton />
+          </div>
+        </div>
+
+        {/* For NORMAL and WIDE layout */}
+        <div className="hidden md:flex w-full justify-between items-center h-full">
+          <nav className="flex flex-1 flex-wrap items-center text-base justify-start h-full">
+            <a className="mr-5 hover:text-white" href="/debates">
+              Debates
+            </a>
+            <a className="mr-5 hover:text-white" href="/topics">
+              Topics
+            </a>
+            <a className="mr-5 hover:text-white" href="/about">
+              About
+            </a>
+          </nav>
+
+          <a
+            className="flex title-font font-medium items-center text-white mb-4 md:mb-0 flex-1 justify-center h-full"
+            href="/"
+          >
+            <Image src="/logo.png" width={48} height={48} alt="logo" />
+            <span className="ml-3 text-xl">Sticking Point</span>
+          </a>
+
+          <div className="flex flex-1 justify-end items-center h-full">
+            <AuthButton />
+          </div>
+        </div>
       </div>
     </header>
   );
