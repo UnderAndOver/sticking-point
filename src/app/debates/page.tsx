@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { generateMock } from "@anatine/zod-mock";
 import { DataTable } from "./(components)/data-table";
-import { zocker } from "zocker";
 import { z } from "zod";
 
 interface Video {
@@ -14,10 +14,10 @@ interface Video {
 }
 
 const schema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
   name: z.string(),
   url: z.string(),
-  uploader: z.string().max(50),
+  uploader: z.string().max(10),
   date: z.date(),
   status: z.enum(["pending", "processing", "success", "failed"]),
 });
@@ -25,7 +25,7 @@ const schema = z.object({
 function getData(): Promise<Video[]> {
   const mockData: Video[] = Array.from(
     { length: 15 },
-    () => zocker(schema).generate() as Video
+    () => generateMock(schema) as Video
   );
   return Promise.resolve(mockData);
 }
