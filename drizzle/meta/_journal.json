@@ -1,0 +1,27 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1698905248541,
+      "tag": "0000_lovely_whistler",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1698905836053,
+      "tag": "0001_tidy_catseye",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1699059991993,
+      "tag": "0002_huge_dust",
+      "breakpoints": true
+    }
+  ]
+}
