@@ -21,6 +21,6 @@
 //   url.pathname = "/";
 //   return NextResponse.redirect(url.toString());
 // }
-export { default } from "next-auth/middleware";
+// export { default } from "next-auth/middleware";
 
 export const config = { matcher: ["/debates"] };
