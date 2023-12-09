@@ -2,12 +2,14 @@
 import Image from "next/image";
 import { useScrollPosition } from "@/hooks/useScrollPosition";
 import { useState, useEffect } from "react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { Menu } from "lucide-react"; // Import the Menu icon from lucide-react
+import SignInDialog from "./SignInDialog";
 
 function AuthButton() {
   const { data: session } = useSession();
   const [showPopup, setShowPopup] = useState(false);
+  const [showSignInDialog, setShowSignInDialog] = useState(false);
   const [opacity, setOpacity] = useState("opacity-0");
 
   let timer: NodeJS.Timeout | undefined;
@@ -89,7 +91,11 @@ function AuthButton() {
   }
   return (
     <>
-      <button onClick={() => signIn()}>Sign in</button>
+      <button onClick={() => setShowSignInDialog(true)}>Sign in</button>
+      <SignInDialog
+        open={showSignInDialog}
+        onClose={() => setShowSignInDialog(false)}
+      />
     </>
   );
 }

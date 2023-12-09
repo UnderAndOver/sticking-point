@@ -1,31 +1,32 @@
 import NextAuth, { NextAuthOptions, Session } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
+import Google from "next-auth/providers/google";
+import Twitter from "next-auth/providers/twitter";
+import Reddit from "next-auth/providers/reddit";
+import Discord from "next-auth/providers/discord";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/db";
-// import { accounts, sessions, users, verificationTokens } from "@/db/schema";
-// import { PgTableFn, pgTable } from "drizzle-orm/pg-core";
-// import { InferSelectModel, eq } from "drizzle-orm";
-// const pgTableHijack: PgTableFn = (name, columns, extraConfig) => {
-//   switch (name) {
-//     case "user":
-//       return users;
-//     case "account":
-//       return accounts;
-//     case "session":
-//       return sessions;
-//     case "verificationToken":
-//       return verificationTokens;
-//     default:
-//       return pgTable(name, columns, extraConfig);
-//   }
-// };
+import { table } from "@/db/schema";
 
 export const authOptions: NextAuthOptions = {
-  adapter: DrizzleAdapter(db),
+  adapter: DrizzleAdapter(db, table),
   providers: [
-    GoogleProvider({
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+    }),
+    Reddit({
+      clientId: process.env.REDDIT_CLIENT_ID ?? "",
+      clientSecret: process.env.REDDIT_CLIENT_SECRET ?? "",
+    }),
+    Twitter({
+      clientId: process.env.TWITTER_CLIENT_ID ?? "",
+      clientSecret: process.env.TWITTER_CLIENT_SECRET ?? "",
+      version: "2.0",
+    }),
+    Discord({
+      clientId: process.env.DISCORD_CLIENT_ID ?? "",
+      clientSecret: process.env.DISCORD_CLIENT_SECRET ?? "",
+      authorization: { params: { scope: "identify email" } },
     }),
   ],
 };

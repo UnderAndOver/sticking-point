@@ -4,6 +4,7 @@ import {
   text,
   primaryKey,
   integer,
+  PgTableFn,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "@auth/core/adapters";
 
@@ -81,3 +82,20 @@ export const verificationTokens = pgTable(
     compoundKey: primaryKey(vt.identifier, vt.token),
   })
 );
+
+//create PgTableFn
+// @ts-ignore
+export const table: PgTableFn = (name, columns, extraconfig) => {
+  switch (name) {
+    case "user":
+      return users;
+    case "account":
+      return accounts;
+    case "session":
+      return sessions;
+    case "verificationToken":
+      return verificationTokens;
+    default:
+      return pgTable(name, columns, extraconfig);
+  }
+};
