@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import WhoAmIButton from "./WhoAmIButton";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import authOptions from "../api/auth/[...nextauth]/authOptions";
 export default async function ServerActionPage() {
   const whoAmI = async () => {
     "use server";
